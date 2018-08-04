@@ -13,8 +13,9 @@
 
 #define ALKSESP32 // tell library to not map pins again
 
-static const uint8_t TX = 1;
-static const uint8_t RX = 3;
+static const uint8_t  UARTA =  0,  RX  =  3,  TX  =  1;
+static const uint8_t  UARTB = -1,  RXB =  9,  TXB = 10;
+static const uint8_t  UARTC = -1,  RXC = 16,  TXC = 17;
 
 static const uint8_t D0 = 40;
 static const uint8_t D1 = 41;

@@ -3,37 +3,66 @@
 #include <string.h>
 #include <inttypes.h>
 
+#include "pins_arduino.h"
 #include "HardwareSerial.h"
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SERIAL)
-HardwareSerial Serial(0);
-HardwareSerial Serial1(1);
-HardwareSerial Serial2(2);
-#endif
+
+  HardwareSerial  Serial ( UARTA );   // UARTx = 0, 1, 2, or undefined (-1). Values
+  HardwareSerial  Serial1( UARTB );   // set in variant 'pins_arduino.h' file
+  HardwareSerial  Serial2( UARTC );
+
+#endif  // 'no globals'
 
 HardwareSerial::HardwareSerial(int uart_nr) : _uart_nr(uart_nr), _uart(NULL) {}
 
+void HardwareSerial::changeUartNumber( int uart_nr )
+{
+    if(_uart) {
+        end();
+    }
+    _uart_nr = uart_nr;
+}
+
 void HardwareSerial::begin(unsigned long baud, uint32_t config, int8_t rxPin, int8_t txPin, bool invert)
 {
-    if(0 > _uart_nr || _uart_nr > 2) {
-        log_e("Serial number is invalid, please use 0, 1 or 2");
+    if ( (-1 > _uart_nr) || (_uart_nr > 2) ) {
+        log_e("Serial number is invalid, please use 0, 1, 2, or undefined (-1)");
         return;
     }
     if(_uart) {
         end();
     }
-    if(_uart_nr == 0 && rxPin < 0 && txPin < 0) {
-        rxPin = 3;
-        txPin = 1;
-    }
-    if(_uart_nr == 1 && rxPin < 0 && txPin < 0) {
-        rxPin = 9;
-        txPin = 10;
-    }
-    if(_uart_nr == 2 && rxPin < 0 && txPin < 0) {
-        rxPin = 16;
-        txPin = 17;
-    }
+
+    // Use 'variant' file RX/TX pin values if:
+    //   a) The physical UART number is defined (0,1, or 2), and
+    //   b) Both the given RX/TX pins are undefined (-1)
+
+    if ( (_uart_nr >= 0) && (rxPin < 0) && (txPin < 0) )
+    {
+       if(_uart_nr == UARTA ) {
+           rxPin = RX;
+           txPin = TX;
+       }
+       if(_uart_nr == UARTB ) {
+           rxPin = RXB;
+           txPin = TXB;
+       }
+       if(_uart_nr == UARTC ) {
+           rxPin = RXC;
+           txPin = TXC;
+       }
+
+       if ( (rxPin < 0) && (txPin < 0) ) {
+          log_e( "Variant file RX/TX cannot both be undefined (-1)" );
+       }
+    } //end-if, set defaults
+
+    // 'uartBegin()' handles an undefined:
+    //   a) Physical UART number (returns NULL)
+    //   b) RX/TX pin pair       (returns NULL)
+    //   c) RX or TX pin         ('half'  UART config)
+
     _uart = uartBegin(_uart_nr, baud, config, rxPin, txPin, 256, invert);
 }
 

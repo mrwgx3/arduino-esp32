@@ -37,6 +37,7 @@ class HardwareSerial: public Stream
 public:
     HardwareSerial(int uart_nr);
 
+    void changeUartNumber( int uart_nr );
     void begin(unsigned long baud, uint32_t config=SERIAL_8N1, int8_t rxPin=-1, int8_t txPin=-1, bool invert=false);
     void end();
     int available(void);
