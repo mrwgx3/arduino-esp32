@@ -36,7 +36,7 @@ void HardwareSerial::begin(unsigned long baud, uint32_t config, int8_t rxPin, in
 
     // Use 'variant' file RX/TX pin values if:
     //   a) The physical UART number is defined (0,1, or 2), and
-    //   b) Both the given RX/TX pins are undefined (-1)
+    //   b) Both the given RX/TX pins are undefined (< 0)
 
     if ( (_uart_nr >= 0) && (rxPin < 0) && (txPin < 0) )
     {
@@ -54,7 +54,7 @@ void HardwareSerial::begin(unsigned long baud, uint32_t config, int8_t rxPin, in
        }
 
        if ( (rxPin < 0) && (txPin < 0) ) {
-          log_e( "Variant file RX/TX cannot both be undefined (-1)" );
+          log_e( "Variant file RX/TX cannot both be undefined (< 0)" );
        }
     } //end-if, set defaults
 
